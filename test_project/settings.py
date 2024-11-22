@@ -69,7 +69,7 @@ WSGI_APPLICATION = "test_project.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/1.9/ref/settings/#databases
 
-HOST = os.environ.get("HOST", "postgres")
+DB_HOST = os.environ.get("DB_HOST", "postgres")
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
@@ -78,7 +78,7 @@ DATABASES = {
         "USER": "django-import-export-extensions-user",
         "NAME": "django-import-export-extensions-dev",
         "PASSWORD": "testpass",
-        "HOST": HOST,
+        "HOST": DB_HOST,
         "PORT": 5432,
     },
 }
@@ -126,8 +126,8 @@ CELERY_TASK_SERIALIZER = "pickle"
 CELERY_ACCEPT_CONTENT = ["pickle", "json"]
 
 CELERY_TASK_ROUTES = {}
-CELERY_BROKER = f"redis://{HOST}/1"
-CELERY_BACKEND = f"redis://{HOST}/1"
+CELERY_BROKER = os.environ.get("CELERY_BROKER")
+CELERY_BACKEND = os.environ.get("CELERY_BACKEND")
 CELERY_TASK_DEFAULT_QUEUE = "development"
 
 DEFAULT_AUTO_FIELD = "django.db.models.AutoField"

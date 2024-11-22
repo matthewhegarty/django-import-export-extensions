@@ -1,6 +1,7 @@
 services:
   redis:
     image: redis:latest
+    container_name: redis_server
     ports:
       - "6379:6379"
   postgres:
@@ -16,3 +17,16 @@ services:
       - POSTGRES_DB=${COMPOSE_PROJECT_NAME}-dev
       - POSTGRES_USER=${COMPOSE_PROJECT_NAME}-user
       - POSTGRES_PASSWORD=testpass
+
+  celery-worker:
+    build:
+      context: .
+      dockerfile: Dockerfile.celery-worker
+    image: django-import-export-extensions/celery-worker:latest
+    container_name: diee_celery_worker
+    env_file: .env
+    volumes:
+      - ./media:/home/app/media
+    depends_on:
+      - postgres
+    entrypoint: ["/home/celery/start-celery-worker.sh"]

@@ -157,7 +157,7 @@ class CeleryImportAdminMixin(
         resource_kwargs = self.get_import_resource_kwargs(request)
 
         if request.method == "POST" and form.is_valid():
-            # create ImportJob and redirect to page with it's status
+            # create ImportJob and redirect to page with its status
             resource_class = self.choose_import_resource_class(form, request)
             job = self.create_import_job(
                 request=request,
