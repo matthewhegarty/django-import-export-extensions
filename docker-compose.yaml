@@ -18,10 +18,27 @@ services:
       - POSTGRES_USER=${COMPOSE_PROJECT_NAME}-user
       - POSTGRES_PASSWORD=testpass
 
+  server:
+    build:
+      context: .
+      dockerfile: docker/server/Dockerfile
+    image: django-import-export-extensions/server:latest
+    container_name: diee_django_server
+    env_file: .env
+    ports:
+      - 8000:8000
+#    volumes:
+#      - ./media:/home/app/media
+    depends_on:
+      - postgres
+    entrypoint: [ "wait-for", "-t", "120", "postgres:5432", "--", "/home/app/server/start-server.sh" ]
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
   celery-worker:
     build:
       context: .
-      dockerfile: Dockerfile.celery-worker
+      dockerfile: docker/celery/Dockerfile
     image: django-import-export-extensions/celery-worker:latest
     container_name: diee_celery_worker
     env_file: .env
