@@ -10,7 +10,7 @@ ENV HOME=/home/app
 ENV APP_HOME=/home/app/server
 RUN mkdir $APP_HOME
 
-RUN apt-get -q update && apt-get -qy install netcat-traditional
+RUN apt-get -q update && apt-get -qy install netcat-traditional redis-tools
 
 COPY pyproject.toml $APP_HOME/
 COPY test_project $APP_HOME/test_project/
