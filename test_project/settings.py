@@ -132,6 +132,43 @@ CELERY_TASK_DEFAULT_QUEUE = "development"
 
 DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 
+LOGGING = {
+    "version": 1,
+    "filters": {
+        "require_debug_true": {"()": "django.utils.log.RequireDebugTrue"},
+        "require_debug_false": {"()": "django.utils.log.RequireDebugFalse"},
+    },
+    "handlers": {
+        "console": {"level": "DEBUG", "class": "logging.StreamHandler"},
+    },
+    "loggers": {
+        "django.db.backends": {"level": "INFO", "handlers": ["console"]},
+        "django.request": {
+            "handlers": ["console"],
+            "propagate": False,
+            "level": "ERROR",
+        },
+        "account": {"handlers": ["console"], "level": "INFO", "propagate": False},
+        "django.server": {
+            "handlers": ["console"],
+            "level": "WARNING",
+            "propagate": False,
+        },
+        "import_export": {
+            "handlers": ["console"],
+            "level": "WARNING",
+            "propagate": False,
+        },
+        "import_export_extensions": {
+            "handlers": ["console"],
+            "level": "DEBUG",
+            "propagate": False,
+        },
+    },
+}
+
+
+
 if DEBUG:
     INSTALLED_APPS += ("debug_toolbar",)
     MIDDLEWARE += ("debug_toolbar.middleware.DebugToolbarMiddleware",)
