@@ -75,6 +75,8 @@ ipython = "^8.27.0"
 # about the current request/response and when clicked, display more details about the panel's content.
 # https://django-debug-toolbar.readthedocs.io/en/latest/
 django-debug-toolbar = "^4.4.6"
+gunicorn = "^23.0.0"
+celery = "^5.4.0"
 
 [tool.poetry.group.linters.dependencies]
 # Mypy is a static type checker for Python.

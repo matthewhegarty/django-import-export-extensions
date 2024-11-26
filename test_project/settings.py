@@ -126,8 +126,8 @@ CELERY_TASK_SERIALIZER = "pickle"
 CELERY_ACCEPT_CONTENT = ["pickle", "json"]
 
 CELERY_TASK_ROUTES = {}
-CELERY_BROKER = "redis://redis/1"
-CELERY_BACKEND = "redis://redis/1"
+CELERY_BROKER = os.environ.get("REDIS_HOST", "redis://redis/1")
+CELERY_BACKEND = os.environ.get("REDIS_HOST", "redis://redis/1")
 CELERY_TASK_DEFAULT_QUEUE = "development"
 
 DEFAULT_AUTO_FIELD = "django.db.models.AutoField"

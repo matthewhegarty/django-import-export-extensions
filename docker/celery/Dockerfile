@@ -15,7 +15,7 @@ WORKDIR $APP_HOME
 ENV CELERY_HOME=/home/celery
 RUN mkdir $CELERY_HOME
 
-RUN apt-get -q update && apt-get -qy install make
+RUN apt-get -q update
 
 COPY pyproject.toml $APP_HOME/
 COPY test_project $APP_HOME/test_project/
@@ -25,7 +25,7 @@ RUN python3 -m venv $VIRTUAL_ENV
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 
 RUN pip install --upgrade pip
-RUN pip install celery poetry django-import-export-extensions
+RUN pip install poetry django-import-export-extensions
 RUN poetry install --with dev
 
 COPY docker/celery/start-celery-worker.sh $CELERY_HOME/

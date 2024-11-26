@@ -10,7 +10,7 @@ ENV HOME=/home/app
 ENV APP_HOME=/home/app/server
 RUN mkdir $APP_HOME
 
-RUN apt-get -q update && apt-get -qy install netcat-traditional redis-tools
+RUN apt-get -q update && apt-get -qy install netcat-traditional
 
 COPY pyproject.toml $APP_HOME/
 COPY test_project $APP_HOME/test_project/
@@ -21,7 +21,7 @@ RUN python3 -m venv $VIRTUAL_ENV
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 
 RUN pip install --upgrade pip
-RUN pip install poetry gunicorn django-import-export-extensions
+RUN pip install poetry django-import-export-extensions
 RUN poetry install --with dev
 
 COPY docker/server/wait-for /usr/local/bin/wait-for
