@@ -17,7 +17,6 @@ services:
       - POSTGRES_DB=${COMPOSE_PROJECT_NAME}-dev
       - POSTGRES_USER=${COMPOSE_PROJECT_NAME}-user
       - POSTGRES_PASSWORD=testpass
-
   server:
     build:
       context: .
@@ -27,14 +26,13 @@ services:
     env_file: .env
     ports:
       - 8000:8000
-#    volumes:
-#      - ./media:/home/app/media
+      #    volumes:
+      #      - ./media:/home/app/media
     depends_on:
       - postgres
-    entrypoint: [ "wait-for", "-t", "120", "postgres:5432", "--", "/home/app/server/start-server.sh" ]
+    entrypoint: ["wait-for", "-t", "120", "postgres:5432", "--", "/home/app/server/start-server.sh"]
     extra_hosts:
       - "host.docker.internal:host-gateway"
-
   celery-worker:
     build:
       context: .

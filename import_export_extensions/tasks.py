@@ -6,10 +6,11 @@ from . import models
 
 logger = logging.getLogger(__name__)
 
+
 @shared_task()
 def parse_data_task(job_id: int):
     """Async task for starting data parsing."""
-    logger.debug('Starting data parse')
+    logger.debug("Starting data parse")
     try:
         models.ImportJob.objects.get(pk=job_id).parse_data()
     except Exception:
@@ -19,7 +20,7 @@ def parse_data_task(job_id: int):
 @shared_task()
 def import_data_task(job_id: int):
     """Async task for starting data import."""
-    logger.debug('Starting data import')
+    logger.debug("Starting data import")
     try:
         models.ImportJob.objects.get(pk=job_id).import_data()
     except Exception:

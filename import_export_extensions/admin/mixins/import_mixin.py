@@ -1,4 +1,3 @@
-import logging
 import typing
 
 from django.conf import settings
@@ -13,7 +12,6 @@ from django.http import (
 from django.shortcuts import get_object_or_404
 from django.template.response import TemplateResponse
 from django.urls import re_path, reverse
-from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 from import_export import admin as import_export_admin
@@ -22,8 +20,6 @@ from import_export import mixins as import_export_mixins
 from ... import models
 from ..forms import ForceImportForm
 from . import base_mixin, types
-
-logger = logging.getLogger(__name__)
 
 
 class CeleryImportAdminMixin(
@@ -146,7 +142,6 @@ class CeleryImportAdminMixin(
             create ImportJob instance and redirect to it's status
 
         """
-        logger.debug("celery_import_action")
         if not self.has_import_permission(request):
             raise PermissionDenied
 
@@ -324,9 +319,7 @@ class CeleryImportAdminMixin(
         resource: types.ResourceObj,
     ):
         """Create and return instance of import job."""
-        logger.debug("create_import_job")
-        start = timezone.now()
-        imp = models.ImportJob.objects.create(
+        return models.ImportJob.objects.create(
             resource_path=resource.class_path,
             data_file=form.cleaned_data["import_file"],
             resource_kwargs=resource.resource_init_kwargs,
@@ -338,8 +331,6 @@ class CeleryImportAdminMixin(
             ),
             force_import=form.cleaned_data["force_import"],
         )
-        logger.debug("completed create_import_job in %s", timezone.now() - start)
-        return imp
 
     def get_import_job(
         self,
