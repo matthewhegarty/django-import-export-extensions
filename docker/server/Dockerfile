@@ -21,7 +21,7 @@ RUN python3 -m venv $VIRTUAL_ENV
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 
 RUN pip install --upgrade pip
-RUN pip install poetry django-import-export-extensions
+RUN pip install poetry git+https://github.com/saritasa-nest/django-import-export-extensions.git@main
 RUN poetry install --with dev
 
 COPY docker/server/wait-for /usr/local/bin/wait-for
