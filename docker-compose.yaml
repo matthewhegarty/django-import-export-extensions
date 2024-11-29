@@ -26,8 +26,6 @@ services:
     env_file: .env
     ports:
       - 8000:8000
-      #    volumes:
-      #      - ./media:/home/app/media
     depends_on:
       - postgres
     entrypoint: ["wait-for", "-t", "120", "postgres:5432", "--", "/home/app/server/start-server.sh"]

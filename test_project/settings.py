@@ -148,11 +148,6 @@ LOGGING = {
             "propagate": False,
             "level": "ERROR",
         },
-        "account": {
-            "handlers": ["console"],
-            "level": "INFO",
-            "propagate": False,
-        },
         "django.server": {
             "handlers": ["console"],
             "level": "WARNING",

@@ -13,6 +13,7 @@ def parse_data_task(job_id: int):
     logger.debug("Starting data parse")
     try:
         models.ImportJob.objects.get(pk=job_id).parse_data()
+        logger.debug("Completed data parse")
     except Exception:
         logger.exception("parse failed")
 
@@ -23,6 +24,7 @@ def import_data_task(job_id: int):
     logger.debug("Starting data import")
     try:
         models.ImportJob.objects.get(pk=job_id).import_data()
+        logger.debug("Completed data import")
     except Exception:
         logger.exception("import failed")
 

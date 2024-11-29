@@ -1,4 +1,5 @@
 import collections
+import logging
 import typing
 from enum import Enum
 
@@ -16,6 +17,7 @@ from import_export.formats import base_formats
 
 from .results import Error, Result, RowResult
 
+logger = logging.getLogger(__name__)
 
 class TaskState(Enum):
     """Class with possible task state values."""
@@ -94,6 +96,7 @@ class CeleryResourceMixin:
         If `force_import=True`, then rows with errors will be skipped.
 
         """
+        logger.debug("starting import")
         self.initialize_task_state(
             state=(
                 TaskState.IMPORTING.name
