@@ -130,7 +130,7 @@ CELERY_BROKER = os.environ.get("REDIS_HOST", "redis://redis/1")
 CELERY_BACKEND = os.environ.get("REDIS_HOST", "redis://redis/1")
 CELERY_TASK_DEFAULT_QUEUE = "development"
 
-DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 LOGGING = {
     "version": 1,
