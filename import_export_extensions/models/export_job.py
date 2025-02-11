@@ -30,7 +30,7 @@ def select_storage():
     """
     custom_storage = getattr(settings, "IMPORT_EXPORT_EXTENSIONS_STORAGE", None)
     logger.debug("Using custom storage %s", custom_storage)
-    
+
     if custom_storage is not None and callable(custom_storage):
         return custom_storage()
 
