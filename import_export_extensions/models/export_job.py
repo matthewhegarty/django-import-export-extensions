@@ -14,6 +14,18 @@ from import_export.formats import base_formats
 from . import tools
 from .core import BaseJob, TaskStateInfo
 
+from django.core.files.storage import default_storage, Storage
+
+
+def select_storage() -> Storage:
+    """
+    Returns the default file storage as configured in Django settings.
+
+    Returns:
+        Storage: The default storage instance
+    """
+    return default_storage
+
 
 class ExportJob(BaseJob):
     """Abstract model for managing celery export jobs.
@@ -83,6 +95,7 @@ class ExportJob(BaseJob):
         verbose_name=_("Data file"),
         upload_to=tools.upload_export_file_to,
         help_text=_("File that contain exported data"),
+        storage=select_storage,
     )
 
     export_task_id = models.CharField(  # noqa: DJ001
