@@ -1,3 +1,4 @@
+import logging
 import pathlib
 import traceback
 import typing
@@ -14,10 +15,10 @@ from import_export.formats import base_formats
 from . import tools
 from .core import BaseJob, TaskStateInfo
 
-from django.core.files.storage import default_storage, Storage
-
 from django.conf import settings
 from django.core.files.storage import default_storage
+
+logger = logging.getLogger(__name__)
 
 
 def select_storage():
@@ -28,7 +29,8 @@ def select_storage():
         Storage: A storage instance to handle file operations
     """
     custom_storage = getattr(settings, "IMPORT_EXPORT_EXTENSIONS_STORAGE", None)
-
+    logger.debug("Using custom storage %s", custom_storage)
+    
     if custom_storage is not None and callable(custom_storage):
         return custom_storage()
 
@@ -229,6 +231,7 @@ class ExportJob(BaseJob):
                 ],
             )
         except Exception as error:
+            logger.exception(error)
             self.traceback = traceback.format_exc()
             self.error_message = str(error)[:512]
             self.export_status = self.ExportStatus.EXPORT_ERROR
