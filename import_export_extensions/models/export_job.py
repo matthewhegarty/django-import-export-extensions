@@ -233,7 +233,7 @@ class ExportJob(BaseJob):
         except Exception as error:
             logger.exception(error)
             self.traceback = traceback.format_exc()
-            self.error_message = str(error)[:512]
+            self.error_message = str(error)[:128]
             self.export_status = self.ExportStatus.EXPORT_ERROR
             self.save(
                 update_fields=[
