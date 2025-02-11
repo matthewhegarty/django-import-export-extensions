@@ -4,7 +4,9 @@ import traceback
 import typing
 import uuid
 
+from django.conf import settings
 from django.core import files as django_files
+from django.core.files.storage import default_storage
 from django.db import models, transaction
 from django.utils import encoding, module_loading, timezone
 from django.utils.translation import gettext_lazy as _
@@ -15,22 +17,21 @@ from import_export.formats import base_formats
 from . import tools
 from .core import BaseJob, TaskStateInfo
 
-from django.conf import settings
-from django.core.files.storage import default_storage
-
 logger = logging.getLogger(__name__)
 
 
 def select_storage():
-    """
-    Returns a storage callable from settings if it exists, otherwise returns default_storage.
+    """Return a storage callable from settings if it exists.
 
     Returns:
         Storage: A storage instance to handle file operations
-    """
-    custom_storage = getattr(settings, "IMPORT_EXPORT_EXTENSIONS_STORAGE", None)
-    logger.debug("Using custom storage %s", custom_storage)
 
+    """
+    custom_storage = getattr(
+        settings,
+        "IMPORT_EXPORT_EXTENSIONS_STORAGE",
+        None,
+    )
     if custom_storage is not None and callable(custom_storage):
         return custom_storage()
 
@@ -231,9 +232,9 @@ class ExportJob(BaseJob):
                 ],
             )
         except Exception as error:
-            logger.exception(error)
             self.traceback = traceback.format_exc()
             self.error_message = str(error)[:128]
+            logger.exception(self.error_message)
             self.export_status = self.ExportStatus.EXPORT_ERROR
             self.save(
                 update_fields=[
