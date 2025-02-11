@@ -16,15 +16,28 @@ from .core import BaseJob, TaskStateInfo
 
 from django.core.files.storage import default_storage, Storage
 
+from django.conf import settings
+from django.core.files.storage import default_storage
 
-def select_storage() -> Storage:
+
+def select_storage():
     """
-    Returns the default file storage as configured in Django settings.
+    Returns a storage callable from settings if it exists, otherwise returns default_storage.
 
     Returns:
-        Storage: The default storage instance
+        Storage: A storage instance to handle file operations
     """
+    custom_storage = getattr(settings, "IMPORT_EXPORT_EXTENSIONS_STORAGE", None)
+
+    if custom_storage is not None and callable(custom_storage):
+        return custom_storage()
+
     return default_storage
+
+
+# Usage example:
+# storage = select_storage('CUSTOM_STORAGE')
+# storage.save('path/to/file', file_content)
 
 
 class ExportJob(BaseJob):
