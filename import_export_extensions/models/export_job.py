@@ -35,11 +35,6 @@ def select_storage():
     return default_storage
 
 
-# Usage example:
-# storage = select_storage('CUSTOM_STORAGE')
-# storage.save('path/to/file', file_content)
-
-
 class ExportJob(BaseJob):
     """Abstract model for managing celery export jobs.
 
