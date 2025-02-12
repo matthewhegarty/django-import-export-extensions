@@ -1,6 +1,10 @@
 import functools
 import uuid
 
+from django.conf import settings
+from django.core.files.storage import default_storage
+
+
 
 def upload_file_to(
     instance,
@@ -22,6 +26,23 @@ def upload_file_to(
         "import_export_extensions/"
         f"{main_folder_name}/{uuid.uuid4()}/{filename}"
     )
+
+def select_storage(key):
+    """Return a storage callable from settings if it exists.
+
+    Returns:
+        Storage: A storage instance to handle file operations
+
+    """
+    custom_storage = getattr(
+        settings,
+        key,
+        None,
+    )
+    if custom_storage is not None and callable(custom_storage):
+        return custom_storage()
+
+    return default_storage
 
 
 upload_export_file_to = functools.partial(

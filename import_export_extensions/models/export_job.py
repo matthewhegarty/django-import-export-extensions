@@ -4,9 +4,7 @@ import traceback
 import typing
 import uuid
 
-from django.conf import settings
 from django.core import files as django_files
-from django.core.files.storage import default_storage
 from django.db import models, transaction
 from django.utils import encoding, module_loading, timezone
 from django.utils.translation import gettext_lazy as _
@@ -20,22 +18,8 @@ from .core import BaseJob, TaskStateInfo
 logger = logging.getLogger(__name__)
 
 
-def select_storage():
-    """Return a storage callable from settings if it exists.
-
-    Returns:
-        Storage: A storage instance to handle file operations
-
-    """
-    custom_storage = getattr(
-        settings,
-        "IMPORT_EXPORT_EXTENSIONS_STORAGE",
-        None,
-    )
-    if custom_storage is not None and callable(custom_storage):
-        return custom_storage()
-
-    return default_storage
+def export_storage():
+    return tools.select_storage("IMPORT_EXPORT_EXTENSIONS_EXPORT_STORAGE")
 
 
 class ExportJob(BaseJob):
@@ -106,7 +90,7 @@ class ExportJob(BaseJob):
         verbose_name=_("Data file"),
         upload_to=tools.upload_export_file_to,
         help_text=_("File that contain exported data"),
-        storage=select_storage,
+        storage=export_storage,
     )
 
     export_task_id = models.CharField(  # noqa: DJ001

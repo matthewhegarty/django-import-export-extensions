@@ -19,6 +19,14 @@ from . import tools
 from .core import BaseJob, TaskStateInfo
 
 
+def import_storage():
+    return tools.select_storage("IMPORT_EXPORT_EXTENSIONS_IMPORT_STORAGE")
+
+
+def import_error_storage():
+    return tools.select_storage("IMPORT_EXPORT_EXTENSIONS_IMPORT_ERROR_STORAGE")
+
+
 class ImportJob(BaseJob):
     """Abstract model for managing celery import jobs.
 
@@ -135,28 +143,30 @@ class ImportJob(BaseJob):
         max_length=512,
         verbose_name=_("Data file"),
         upload_to=tools.upload_import_file_to,
-        help_text=_("File that contain data to be imported"),
+        help_text=_("File that contains data to be imported"),
+        storage=import_storage,
     )
     input_errors_file = models.FileField(
         max_length=512,
         null=True,
         verbose_name=_("Input errors file"),
-        help_text=_("File that contain failed rows"),
+        help_text=_("File that contains failed rows"),
         upload_to=tools.upload_import_file_to,
+        storage=import_error_storage,
     )
 
     parse_task_id = models.CharField(
         default=str,
         max_length=36,
         verbose_name=_("Parsing task ID"),
-        help_text=_("Celery task ID that start `parse_data`"),
+        help_text=_("Celery task ID that starts with `parse_data`"),
     )
 
     import_task_id = models.CharField(
         max_length=36,
         default=str,
         verbose_name=_("Import task ID"),
-        help_text=_("Celery task ID that start `import_data`"),
+        help_text=_("Celery task ID that starts with `import_data`"),
     )
 
     parse_finished = models.DateTimeField(
