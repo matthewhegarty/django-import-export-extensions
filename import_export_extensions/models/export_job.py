@@ -19,6 +19,14 @@ logger = logging.getLogger(__name__)
 
 
 def export_storage():
+    """Return a storage callable from settings if it exists.
+
+    Defaults to ``default_storage``.
+
+    Returns:
+        Storage: A storage instance to store file exports errors.
+
+    """
     return tools.select_storage("IMPORT_EXPORT_EXTENSIONS_EXPORT_STORAGE")
 
 

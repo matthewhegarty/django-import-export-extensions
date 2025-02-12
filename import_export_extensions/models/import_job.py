@@ -20,11 +20,29 @@ from .core import BaseJob, TaskStateInfo
 
 
 def import_storage():
+    """Return a storage callable from settings if it exists.
+
+    Defaults to ``default_storage``.
+
+    Returns:
+        Storage: A storage instance to store file imports.
+
+    """
     return tools.select_storage("IMPORT_EXPORT_EXTENSIONS_IMPORT_STORAGE")
 
 
 def import_error_storage():
-    return tools.select_storage("IMPORT_EXPORT_EXTENSIONS_IMPORT_ERROR_STORAGE")
+    """Return a storage callable from settings if it exists.
+
+    Defaults to ``default_storage``.
+
+    Returns:
+        Storage: A storage instance to store file import errors.
+
+    """
+    return tools.select_storage(
+        "IMPORT_EXPORT_EXTENSIONS_IMPORT_ERROR_STORAGE",
+    )
 
 
 class ImportJob(BaseJob):

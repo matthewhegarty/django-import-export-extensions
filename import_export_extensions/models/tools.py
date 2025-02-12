@@ -5,7 +5,6 @@ from django.conf import settings
 from django.core.files.storage import default_storage
 
 
-
 def upload_file_to(
     instance,
     filename: str,
@@ -26,6 +25,7 @@ def upload_file_to(
         "import_export_extensions/"
         f"{main_folder_name}/{uuid.uuid4()}/{filename}"
     )
+
 
 def select_storage(key):
     """Return a storage callable from settings if it exists.
