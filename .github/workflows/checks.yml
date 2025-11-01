@@ -14,15 +14,16 @@ jobs:
           - "3.11"
           - "3.12"
           - "3.13"
+          - "3.14"
         django-version:
           - ">=4.2,<4.3"
-          - ">=5.0,<5.2"
+          - ">=5.0,<5.3"
     name: Python ${{ matrix.python-version }} - Django ${{ matrix.django-version }}
     steps:
       - name: Check out repository code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: ${{ matrix.python-version }}
       - name: Install Poetry
@@ -37,7 +38,12 @@ jobs:
         uses: actions/cache@v4
         with:
           path: .venv
-          key: ${{ runner.os }}-poetry-${{ matrix.python-version }}-${{ hashFiles('**/poetry.lock') }}
+          key: ${{ runner.os }}-${{ matrix.python-version }}-poetry-${{ hashFiles('**/poetry.lock') }}
+      - name: Cache pre-commit
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pre-commit
+          key: ${{ runner.os }}-${{ matrix.python-version }}-pre-commit-${{ hashFiles('**/.pre-commit-config.yaml') }}
       - name: Install local dependencies
         if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
         run: poetry install --no-interaction

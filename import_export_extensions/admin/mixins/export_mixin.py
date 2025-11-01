@@ -43,6 +43,10 @@ class CeleryExportAdminMixin(
     # export data encoding
     to_encoding = "utf-8"
 
+    export_form_class: type[import_export_forms.ExportForm] = (
+        import_export_forms.SelectableFieldsExportForm
+    )
+
     # template used to display ExportForm
     celery_export_template_name = "admin/import_export/export.html"
 
@@ -65,6 +69,9 @@ class CeleryExportAdminMixin(
     has_export_permission = (
         import_export_admin.ExportMixin.has_export_permission
     )
+    get_export_form_class = import_export_admin.ExportMixin.get_export_form_class  # noqa
+    get_export_resource_fields_from_form = import_export_admin.ExportMixin.get_export_resource_fields_from_form  # noqa
+    is_skip_export_form_enabled = import_export_admin.ExportMixin.is_skip_export_form_enabled  # noqa
 
     def get_export_context_data(self, **kwargs):
         """Get context data for export."""
@@ -120,18 +127,36 @@ class CeleryExportAdminMixin(
             raise PermissionDenied
 
         formats = self.get_export_formats()
-        form = import_export_forms.ExportForm(
-            formats=formats,
-            resources=self.get_export_resource_classes(request),
-            data=request.POST or None,
-        )
         resource_kwargs = self.get_export_resource_kwargs(
             *args,
             **kwargs,
             request=request,
         )
+        if self.is_skip_export_form_enabled():
+            job = self.create_export_job(
+                request=request,
+                resource_class=self.get_export_resource_classes(request)[0],
+                resource_kwargs=resource_kwargs,
+                file_format=formats[0],
+            )
+            return self._redirect_to_export_status_page(
+                request=request,
+                job=job,
+            )
+
+        form_type = self.get_export_form_class()
+        form = form_type(
+            formats=formats,
+            resources=self.get_export_resource_classes(request),
+            data=request.POST or None,
+        )
+
         if request.method == "POST" and form.is_valid():
             file_format = formats[int(form.cleaned_data["format"])]
+            # Get the selected export fields from the form
+            resource_kwargs["export_fields"] = (
+                self.get_export_resource_fields_from_form(form)
+            )
             # create ExportJob and redirect to page with it's status
             job = self.create_export_job(
                 request=request,
@@ -268,6 +293,84 @@ class CeleryExportAdminMixin(
 
         """
         return get_object_or_404(models.ExportJob, id=job_id)
+
+    def get_resource_kwargs(self, request, *args, **kwargs):
+        """Return filter kwargs for resource queryset."""
+        resource_kwargs = super().get_resource_kwargs(request, *args, **kwargs)
+        resource_kwargs["admin_filters"] = self._export_get_admin_filter(
+            request=request,
+        )
+        return resource_kwargs
+
+    def _export_get_admin_filter(
+        self,
+        request: WSGIRequest,
+    ) -> dict[str, typing.Any]:
+        """Get GET query params to pass them to resource class."""
+        query_params = dict(request.GET)
+        search_kwargs = self._export_get_search_filter(
+            request=request,
+            value=query_params.pop("q", []),
+        )
+        admin_filter = {}
+        admin_filter = {
+            key: value
+            for key in query_params
+            for value in query_params[key]
+            if key in self.get_list_filter(request)
+        }
+        admin_filter["search"] = search_kwargs
+        return admin_filter
+
+
+    def _export_get_search_filter(
+        self,
+        request: WSGIRequest,
+        value: list[str],
+    ) -> dict[str, str]:
+        """Return search filter for resource class.
+
+        Inspired by https://github.com/django/django/blob/d6925f0d6beb3c08ae24bdb8fd83ddb13d1756e4/django/contrib/admin/options.py#L1130
+
+        """
+        extracted_value: str = (
+            value[0]
+            if value
+            else ""
+        )
+        search_kwargs = {}
+        used_fields = []
+        for search_field in self.get_search_fields(request):
+            lookup_field, model_field = self._export_construct_search(
+                search_field,
+            )
+            if model_field in used_fields:
+                continue
+            used_fields.append(model_field)
+            search_kwargs[lookup_field] = extracted_value
+        return search_kwargs
+
+    def _export_construct_search(
+        self,
+        field_name: str,
+    ) -> tuple[str, str]:
+        """Get search lookups.
+
+        Inspired by https://github.com/django/django/blob/d6925f0d6beb3c08ae24bdb8fd83ddb13d1756e4/django/contrib/admin/options.py#L1137
+
+        """
+        match (search_type := field_name[0]):
+            case "^":
+                lookup = "istartswith"
+            case "=":
+                lookup = "iexact"
+            case "@":
+                lookup = "search"
+            case _:
+                search_type = ""
+                lookup = "icontains"
+        field_name = field_name.removeprefix(search_type)
+        return f"{field_name}__{lookup}", field_name
 
     def _redirect_to_export_status_page(
         self,
